@@ -1,4 +1,7 @@
+use futures::{stream, StreamExt};
 use serde::Deserialize;
+
+const MAX_CONCURRENT_REQUESTS: usize = 10;
 
 #[tokio::main]
 async fn main() {
@@ -22,13 +25,17 @@ struct Website {
 }
 
 async fn check_urls(doc: Document) -> Vec<(String, bool)> {
-    let mut results: Vec<_> = Default::default();
-    for Website { name, url } in doc.urls {
-        let ok = match reqwest::get(url).await {
-            Ok(resp) => resp.text().await.is_ok(),
-            Err(_) => false,
+    let vec_of_futures = doc.urls.into_iter().map(|Website { name, url }| async {
+        let Ok(resp) = reqwest::get(url).await else {
+            return (name, false);
         };
-        results.push((name, ok));
-    }
-    results
+        (name, resp.text().await.is_ok())
+    });
+
+    let stream_of_futures = stream::iter(vec_of_futures);
+
+    stream_of_futures
+        .buffer_unordered(MAX_CONCURRENT_REQUESTS)
+        .collect()
+        .await
 }

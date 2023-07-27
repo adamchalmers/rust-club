@@ -1,6 +1,22 @@
 {
     "urls": [
         {
+            "name": "KittyCAD",
+            "url": "https://kittycad.io"
+        },
+        {
+            "name": "Olivia's website",
+            "url": "https://losslessbits.com/"
+        },
+        {
+            "name": "Steam",
+            "url": "https://steampowered.com"
+        },
+        {
+            "name": "David's website",
+            "url": "http://harvey-macaulay.com/"
+        },
+        {
             "name": "Adam's website",
             "url": "https://adamchalmers.com"
         },
